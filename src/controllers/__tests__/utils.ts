@@ -102,6 +102,8 @@ export class Samples {
       items: base,
       mean: base.reduce((acc, v) => acc + v, 0) / base.length,
       outliers: base.slice(0, 3).concat(base.slice(shift + 5)),
+      startTimes: [],
+      endTimes: []
     };
   }
 

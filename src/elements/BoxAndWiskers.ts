@@ -21,6 +21,7 @@ export interface IBoxAndWhiskersOptions extends IStatsBaseOptions {
   lowerBackgroundColor: string;
 }
 
+
 export interface IBoxAndWhiskerProps extends IStatsBaseProps {
   q1: number;
   q3: number;
@@ -28,6 +29,8 @@ export interface IBoxAndWhiskerProps extends IStatsBaseProps {
   whiskerMin: number;
   whiskerMax: number;
   mean: number;
+  startTimes: number[];
+  endTimes: number[];
 }
 
 export class BoxAndWiskers extends StatsBase<IBoxAndWhiskerProps, IBoxAndWhiskersOptions> {
@@ -39,12 +42,12 @@ export class BoxAndWiskers extends StatsBase<IBoxAndWhiskerProps, IBoxAndWhisker
     ctx.lineWidth = this.options.borderWidth;
 
     this._drawBoxPlot(ctx);
-    this._drawOutliers(ctx);
-    this._drawMeanDot(ctx);
+    //this._drawOutliers(ctx);
+    //this._drawMeanDot(ctx);
 
     ctx.restore();
 
-    this._drawItems(ctx);
+    //this._drawItems(ctx);
   }
 
   protected _drawBoxPlot(ctx: CanvasRenderingContext2D): void {
@@ -56,21 +59,33 @@ export class BoxAndWiskers extends StatsBase<IBoxAndWhiskerProps, IBoxAndWhisker
   }
 
   protected _drawBoxPlotVertical(ctx: CanvasRenderingContext2D): void {
-    const { options } = this;
-    const props = this.getProps(['x', 'width', 'q1', 'q3', 'median', 'whiskerMin', 'whiskerMax']);
-
+    //const { options } = this;
+    const props = this.getProps(['x', 'width', 'q1', 'q3', 'median', 'whiskerMin', 'whiskerMax','startTimes','endTimes']);
+    const { startTimes } = props;
+    const { endTimes } = props;
     const { x } = props;
     const { width } = props;
     const x0 = x - width / 2;
+
+    /*if (times != undefined && times.length > 0) {
+      times.forEach((time)=>{
+        console.log(time.startTime,time.endTime,props.q1,props.q3);
+      })
+    }*/
+    for (let i = 0; i < startTimes.length; i++){
+      ctx.fillRect(x0, startTimes[i], width, endTimes[i]-startTimes[i]);
+    }
+    
     // Draw the q1>q3 box
-    if (props.q3 > props.q1) {
+    /*if (props.q3 > props.q1) {
       ctx.fillRect(x0, props.q1, width, props.q3 - props.q1);
     } else {
       ctx.fillRect(x0, props.q3, width, props.q1 - props.q3);
-    }
+    }*/
 
     // Draw the median line
     ctx.save();
+    /*
     if (options.medianColor && options.medianColor !== 'transparent' && options.medianColor !== '#0000') {
       ctx.strokeStyle = options.medianColor;
     }
@@ -96,7 +111,8 @@ export class BoxAndWiskers extends StatsBase<IBoxAndWhiskerProps, IBoxAndWhisker
       }
     }
     ctx.restore();
-
+    
+    /*
     // Draw the border around the main q1>q3 box
     if (props.q3 > props.q1) {
       ctx.strokeRect(x0, props.q1, width, props.q3 - props.q1);
@@ -116,6 +132,7 @@ export class BoxAndWiskers extends StatsBase<IBoxAndWhiskerProps, IBoxAndWhisker
     ctx.lineTo(x, props.q3);
     ctx.closePath();
     ctx.stroke();
+    */
   }
 
   protected _drawBoxPlotHorizontal(ctx: CanvasRenderingContext2D): void {

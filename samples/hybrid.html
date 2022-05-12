@@ -1,58 +1,60 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Box Plot Chart</title>
-    <script src="https://unpkg.com/chart.js@3.7.1/dist/chart.js"></script>
-    <script src="../build/index.umd.js"></script>
-    <script src="./utils.js"></script>
-  </head>
 
-  <body>
-    <div id="container" style="width: 75%">
-      <canvas id="canvas"></canvas>
-    </div>
-    <script>
-      const samples = this.Samples.utils;
-      const data = {
-        labels: samples.months({ count: 7 }),
-        datasets: [
-          {
-            label: 'Box',
-            type: 'boxplot',
-            backgroundColor: 'steelblue',
-            data: samples.boxplots({ count: 7 }),
-          },
-          {
-            label: 'Bar',
-            type: 'bar',
-            backgroundColor: 'red',
-            data: samples.numbers({ count: 7, max: 150 }),
-          },
-          {
-            label: 'Line',
-            type: 'line',
-            data: samples.numbers({ count: 7, max: 150 }),
-          },
-        ],
-      };
+<head>
+  <title>Box Plot Chart</title>
+  <script src="https://unpkg.com/chart.js@3.7.1/dist/chart.js"></script>
+  <script src="../build/index.umd.js"></script>
+  <script src="./utils.js"></script>
+</head>
 
-      window.onload = () => {
-        const ctx = document.getElementById('canvas').getContext('2d');
-        const myBar = new Chart(ctx, {
+<body>
+  <div id="container" style="width: 75%">
+    <canvas id="canvas"></canvas>
+  </div>
+  <script>
+    const samples = this.Samples.utils;
+    const data = {
+      labels: samples.months({ count: 7 }),
+      datasets: [
+        {
+          label: 'Box',
           type: 'boxplot',
-          data: data,
-          options: {
-            responsive: true,
-            legend: {
-              position: 'top',
-            },
-            title: {
-              display: true,
-              text: 'Chart.js Box Plot and Line Chart',
-            },
+          backgroundColor: 'steelblue',
+          data: samples.boxplots({ count: 7 }),
+        },
+        {
+          label: 'Bar',
+          type: 'bar',
+          backgroundColor: 'red',
+          data: samples.numbers({ count: 7, max: 150 }),
+        },
+        {
+          label: 'Line',
+          type: 'line',
+          data: samples.numbers({ count: 7, max: 150 }),
+        },
+      ],
+    };
+
+    window.onload = () => {
+      const ctx = document.getElementById('canvas').getContext('2d');
+      const myBar = new Chart(ctx, {
+        type: 'boxplot',
+        data: data,
+        options: {
+          responsive: true,
+          legend: {
+            position: 'top',
           },
-        });
-      };
-    </script>
-  </body>
+          title: {
+            display: true,
+            text: 'Chart.js Box Plot and Line Chart',
+          },
+        },
+      });
+    };
+  </script>
+</body>
+
 </html>

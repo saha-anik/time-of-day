@@ -1,109 +1,134 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Box Plot Chart</title>
-    <script src="https://unpkg.com/chart.js@3.7.1/dist/chart.js"></script>
-    <script src="../build/index.umd.js"></script>
-    <script src="https://unpkg.com/d3-random@latest/dist/d3-random.min.js"></script>
-    <script src="./utils.js"></script>
-  </head>
 
-  <body>
-    <div id="container" style="width: 75%">
-      <canvas id="canvas"></canvas>
-    </div>
-    <button id="randomizeData">Randomize Data</button>
-    <button id="addDataset">Add Dataset</button>
-    <button id="removeDataset">Remove Dataset</button>
-    <button id="addData">Add Data</button>
-    <button id="removeData">Remove Data</button>
-    <script>
-      const samples = this.Samples.utils;
-      const color = Chart.helpers.color;
-      const b = d3.randomNormal();
-      const random = (min, max) => () => b() * ((max || 1) - (min || 0)) + (min || 0);
-      const boxplotData = {
-        labels: samples.months({ count: 7 }),
-        datasets: [
-          {
-            label: 'Dataset 1',
-            backgroundColor: color(window.chartColors.red).alpha(0.5).rgbString(),
-            borderColor: window.chartColors.red,
-            borderWidth: 1,
-            data: samples.boxplots({ count: 7, random: random }),
-            outlierBackgroundColor: '#999999',
-          },
-          {
-            label: 'Dataset 2',
-            backgroundColor: color(window.chartColors.blue).alpha(0.5).rgbString(),
-            borderColor: window.chartColors.blue,
-            borderWidth: 1,
-            data: samples.boxplotsArray({ count: 7, random: random }),
-            outlierBackgroundColor: '#999999',
-            lowerBackgroundColor: '#461e7d',
-          },
-        ],
-      };
+<head>
+  <title>Box Plot Chart</title>
+  <script src="https://unpkg.com/chart.js@3.7.1/dist/chart.js"></script>
+  <script src="../build/index.umd.js"></script>
+  <script src="https://unpkg.com/d3-random@latest/dist/d3-random.min.js"></script>
+  <script src="./utils.js"></script>
+</head>
 
-      window.onload = () => {
-        const ctx = document.getElementById('canvas').getContext('2d');
-        const myBar = new Chart(ctx, {
-          type: 'boxplot',
-          data: boxplotData,
-        });
+<body>
+  <div id="container" style="width: 75%">
+    <canvas id="canvas"></canvas>
+  </div>
+  <button id="randomizeData">Randomize Data</button>
+  <button id="addDataset">Add Dataset</button>
+  <button id="removeDataset">Remove Dataset</button>
+  <button id="addData">Add Data</button>
+  <button id="removeData">Remove Data</button>
+  <script>
+    const samples = this.Samples.utils;
+    const color = Chart.helpers.color;
+    const b = d3.randomNormal();
+    const random = (min, max) => () => b() * ((max || 1) - (min || 0)) + (min || 0);
+    const months = 2;
+    const data = samples.boxplots({ count: months, random: random })
 
-        document.getElementById('randomizeData').addEventListener('click', () => {
-          boxplotData.datasets.forEach(function (dataset) {
-            dataset.data = samples.boxplots({ count: 7 });
-          });
-          myBar.update();
-        });
+    const boxplotData = {
+      labels: samples.months({ count: months }),
+      datasets: [
+        {
+          label: 'Dataset 1',
+          backgroundColor: color(window.chartColors.red).alpha(0.5).rgbString(),
+          borderColor: window.chartColors.red,
+          borderWidth: 1,
+          data: data,
+          outlierBackgroundColor: '#999999',
+        },
+        {
+          label: 'Dataset 1',
+          backgroundColor: color(window.chartColors.blue).alpha(0.5).rgbString(),
+          borderColor: window.chartColors.blue,
+          borderWidth: 1,
+          data: samples.boxplots({ count: months, random: random }),
+          outlierBackgroundColor: '#999999',
+          lowerBackgroundColor: '#461e7d',
+        },
+      ],
+    };
 
-        const colorNames = Object.keys(window.chartColors);
-        document.getElementById('addDataset').addEventListener('click', () => {
-          const colorName = colorNames[boxplotData.datasets.length % colorNames.length];
-          const dsColor = window.chartColors[colorName];
-          const newDataset = {
-            label: 'Dataset ' + boxplotData.datasets.length,
-            backgroundColor: color(dsColor).alpha(0.5).rgbString(),
-            borderColor: dsColor,
-            borderWidth: 1,
-            data: samples.boxplots({ count: boxplotData.labels.length }),
-          };
-
-          boxplotData.datasets.push(newDataset);
-          myBar.update();
-        });
-
-        document.getElementById('addData').addEventListener('click', () => {
-          if (boxplotData.datasets.length > 0) {
-            const month = samples.nextMonth(boxplotData.labels.length);
-            boxplotData.labels.push(month);
-
-            for (let index = 0; index < boxplotData.datasets.length; ++index) {
-              //window.myBar.addData(randomBoxPlot(), index);
-              boxplotData.datasets[index].data.push(samples.randomBoxPlot());
+    window.onload = () => {
+      const ctx = document.getElementById('canvas').getContext('2d');
+      const myBar = new Chart(ctx, {
+        type: 'boxplot',
+        data: boxplotData,
+        options: {
+          scales: {
+            x: {
+              stacked: true,
+              barPercentage: 0.2
+            },
+            myScale: {
+              min: 0,
+              max: 1440,
+              reverse: false,
+              position: 'left',
+              ticks: {
+                stepSize: 240,
+                callback: function (value, index, ticks) {
+                  return `${String((value / 240) * 4).padStart(2, '0')}:00`;
+                }
+              }// `axis` is determined by the position as `'y'`
             }
-
-            myBar.update();
           }
-        });
+        }
+      });
 
-        document.getElementById('removeDataset').addEventListener('click', () => {
-          boxplotData.datasets.splice(0, 1);
+      document.getElementById('randomizeData').addEventListener('click', () => {
+        boxplotData.datasets.forEach(function (dataset) {
+          dataset.data = samples.boxplots({ count: 7 });
+        });
+        myBar.update();
+      });
+
+      const colorNames = Object.keys(window.chartColors);
+      document.getElementById('addDataset').addEventListener('click', () => {
+        const colorName = colorNames[boxplotData.datasets.length % colorNames.length];
+        const dsColor = window.chartColors[colorName];
+        const newDataset = {
+          label: 'Dataset ' + boxplotData.datasets.length,
+          backgroundColor: color(dsColor).alpha(0.5).rgbString(),
+          borderColor: dsColor,
+          borderWidth: 1,
+          data: samples.boxplots({ count: boxplotData.labels.length }),
+        };
+
+        boxplotData.datasets.push(newDataset);
+        myBar.update();
+      });
+
+      document.getElementById('addData').addEventListener('click', () => {
+        if (boxplotData.datasets.length > 0) {
+          const month = samples.nextMonth(boxplotData.labels.length);
+          boxplotData.labels.push(month);
+
+          for (let index = 0; index < boxplotData.datasets.length; ++index) {
+            //window.myBar.addData(randomBoxPlot(), index);
+            boxplotData.datasets[index].data.push(samples.randomBoxPlot());
+          }
+
           myBar.update();
+        }
+      });
+
+      document.getElementById('removeDataset').addEventListener('click', () => {
+        boxplotData.datasets.splice(0, 1);
+        myBar.update();
+      });
+
+      document.getElementById('removeData').addEventListener('click', () => {
+        boxplotData.labels.splice(-1, 1); // remove the label first
+
+        boxplotData.datasets.forEach((dataset) => {
+          dataset.data.pop();
         });
 
-        document.getElementById('removeData').addEventListener('click', () => {
-          boxplotData.labels.splice(-1, 1); // remove the label first
+        myBar.update();
+      });
+    };
+  </script>
+</body>
 
-          boxplotData.datasets.forEach((dataset) => {
-            dataset.data.pop();
-          });
-
-          myBar.update();
-        });
-      };
-    </script>
-  </body>
 </html>

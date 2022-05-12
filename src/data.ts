@@ -20,6 +20,7 @@ export {
   quantilesType7,
 } from '@sgratzl/boxplots';
 
+
 export interface IBaseStats {
   min: number;
   max: number;
@@ -29,6 +30,8 @@ export interface IBaseStats {
   mean: number;
   items: readonly number[];
   outliers: readonly number[];
+  startTimes: number[];
+  endTimes: number[];
 }
 
 export interface IBoxPlot extends IBaseStats {
@@ -192,6 +195,8 @@ export function boxplotStats(arr: readonly number[] | Float32Array | Float64Arra
     min: r.min,
     q1: r.q1,
     q3: r.q3,
+    startTimes: [],
+    endTimes: []
   };
 }
 
@@ -232,6 +237,8 @@ export function violinStats(arr: readonly number[], options: IViolinOptions): IV
     coords,
     outliers: [], // items.filter((d) => d < stats.q1 || d > stats.q3),
     maxEstimate,
+    startTimes: [],
+    endTimes: []
   };
 }
 

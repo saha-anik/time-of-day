@@ -20,6 +20,7 @@ import { boxOptionsKeys } from '../elements/BoxAndWiskers';
 export class BoxPlotController extends StatsBase<IBoxPlot, Required<IBoxplotOptions>> {
   // eslint-disable-next-line class-methods-use-this
   protected _parseStats(value: unknown, config: IBoxplotOptions): IBoxPlot | undefined {
+    //change code
     return asBoxPlotStats(value, config);
   }
 
@@ -42,7 +43,7 @@ export class BoxPlotController extends StatsBase<IBoxPlot, Required<IBoxplotOpti
         numbers: {
           type: 'number',
           properties: (BarController.defaults as any).animations.numbers.properties.concat(
-            ['q1', 'q3', 'min', 'max', 'median', 'whiskerMin', 'whiskerMax', 'mean'],
+            ['q1', 'q3', 'min', 'max', 'median', 'whiskerMin', 'whiskerMax', 'mean', 'startTimes','endTimes'],
             boxOptionsKeys.filter((c) => !c.endsWith('Color'))
           ),
         },

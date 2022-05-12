@@ -68,12 +68,14 @@ export abstract class StatsBase<S extends IBaseStats, C extends Required<IBaseOp
         target[key] = mapper(v);
       }
     }
-    for (const key of ['outliers', 'items']) {
+
+    for (const key of ['outliers', 'items', 'startTimes','endTimes']) {
       if (Array.isArray(source[key as keyof IBaseStats])) {
         // eslint-disable-next-line no-param-reassign
-        target[key] = source[key as 'outliers' | 'items'].map(mapper);
+        target[key] = source[key as 'outliers' | 'items' | 'startTimes' |'endTimes'].map(mapper);
       }
     }
+
   }
 
   getMinMax(scale: Scale, canStack?: boolean | undefined): { min: number; max: number } {
