@@ -1,4 +1,4 @@
-import boxplots, {
+import {
   quantilesFivenum,
   quantilesHigher,
   quantilesHinges,
@@ -19,7 +19,6 @@ export {
   quantilesNearest,
   quantilesType7,
 } from '@sgratzl/boxplots';
-
 
 export interface IBaseStats {
   min: number;
@@ -182,66 +181,6 @@ function determineStatsOptions(options?: IBaseOptions) {
   };
 }
 
-export function boxplotStats(arr: readonly number[] | Float32Array | Float64Array, options: IBaseOptions): IBoxPlot {
-  const r = boxplots(arr, determineStatsOptions(options));
-  return {
-    items: Array.from(r.items),
-    outliers: r.outlier,
-    whiskerMax: r.whiskerHigh,
-    whiskerMin: r.whiskerLow,
-    max: r.max,
-    median: r.median,
-    mean: r.mean,
-    min: r.min,
-    q1: r.q1,
-    q3: r.q3,
-    startTimes: [],
-    endTimes: []
-  };
-}
-
-function computeSamples(min: number, max: number, points: number) {
-  // generate coordinates
-  const range = max - min;
-  const samples: number[] = [];
-  const inc = range / points;
-  for (let v = min; v <= max && inc > 0; v += inc) {
-    samples.push(v);
-  }
-  if (samples[samples.length - 1] !== max) {
-    samples.push(max);
-  }
-  return samples;
-}
-
-export function violinStats(arr: readonly number[], options: IViolinOptions): IViolin | undefined {
-  // console.assert(Array.isArray(arr));
-  if (arr.length === 0) {
-    return undefined;
-  }
-  const stats = boxplots(arr, determineStatsOptions(options));
-
-  // generate coordinates
-  const samples = computeSamples(stats.min, stats.max, options.points);
-  const coords = samples.map((v) => ({ v, estimate: stats.kde(v) }));
-  const maxEstimate = coords.reduce((a, d) => Math.max(a, d.estimate), Number.NEGATIVE_INFINITY);
-
-  return {
-    max: stats.max,
-    min: stats.min,
-    mean: stats.mean,
-    median: stats.median,
-    q1: stats.q1,
-    q3: stats.q3,
-    items: Array.from(stats.items),
-    coords,
-    outliers: [], // items.filter((d) => d < stats.q1 || d > stats.q3),
-    maxEstimate,
-    startTimes: [],
-    endTimes: []
-  };
-}
-
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export function asBoxPlotStats(value: any, options: IBoxplotOptions): IBoxPlot | undefined {
   if (!value) {
@@ -263,24 +202,7 @@ export function asBoxPlotStats(value: any, options: IBoxplotOptions): IBoxPlot |
     }
     return value;
   }
-  if (!Array.isArray(value)) {
-    return undefined;
-  }
-  return boxplotStats(value, options);
-}
-
-// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-export function asViolinStats(value: any, options: IViolinOptions): IViolin | undefined {
-  if (!value) {
-    return undefined;
-  }
-  if (typeof value.median === 'number' && Array.isArray(value.coords)) {
-    return value;
-  }
-  if (!Array.isArray(value)) {
-    return undefined;
-  }
-  return violinStats(value, options);
+  return undefined;
 }
 
 export function rnd(seed = Date.now()): () => number {

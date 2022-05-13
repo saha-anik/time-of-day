@@ -74,11 +74,11 @@ window.chartColors = {
       return data;
     },
 
-    randomStartAndEndTime: function(){
-      const startTime = this.randF(1, 21)()*60;
-      const endTime = startTime + this.randF(1, 3)()*60;
-      console.log(startTime,endTime)
-      return [Math.trunc(startTime),Math.trunc(endTime)]
+    randomStartAndEndTime: function () {
+      const startTime = this.randF(1, 21)() * 60;
+      const endTime = startTime + this.randF(1, 3)() * 60;
+      console.log(startTime, endTime);
+      return [Math.trunc(startTime), Math.trunc(endTime)];
     },
 
     randomBoxPlot: function (config) {
@@ -89,22 +89,21 @@ window.chartColors = {
       const shift = 3;
       let startTimes = [];
       let endTimes = [];
-      for (let i = 0; i < 1; i++){
+      for (let i = 0; i < 1; i++) {
         let [startTime, endTime] = this.randomStartAndEndTime();
         startTimes.push(startTime);
         endTimes.push(endTime);
       }
-      console.log("q1,q3",base[shift + 1],base[shift + 4]);
       return {
         min: 0,
         q1: base[shift + 1],
         median: base[shift + 2],
         mean: base[shift + 3],
         q3: base[shift + 4],
-        max: 60*24,
+        max: 60 * 24,
         outliers: base.slice(0, 3).concat(base.slice(shift + 6)),
         startTimes,
-        endTimes
+        endTimes,
       };
     },
 
@@ -113,15 +112,6 @@ window.chartColors = {
       const data = [];
       for (let i = 0; i < count; ++i) {
         data.push(this.randomBoxPlot(config));
-      }
-      return data;
-    },
-
-    boxplotsArray: function (config) {
-      const count = (config || {}).count || 8;
-      const data = [];
-      for (let i = 0; i < count; ++i) {
-        data.push(this.numbers({ ...config, count: config.points || 50 }));
       }
       return data;
     },

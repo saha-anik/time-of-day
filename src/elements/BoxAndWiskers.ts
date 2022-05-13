@@ -21,7 +21,6 @@ export interface IBoxAndWhiskersOptions extends IStatsBaseOptions {
   lowerBackgroundColor: string;
 }
 
-
 export interface IBoxAndWhiskerProps extends IStatsBaseProps {
   q1: number;
   q3: number;
@@ -51,148 +50,33 @@ export class BoxAndWiskers extends StatsBase<IBoxAndWhiskerProps, IBoxAndWhisker
   }
 
   protected _drawBoxPlot(ctx: CanvasRenderingContext2D): void {
-    if (this.isVertical()) {
-      this._drawBoxPlotVertical(ctx);
-    } else {
-      this._drawBoxPlotHorizontal(ctx);
-    }
+    this._drawBoxPlotVertical(ctx);
   }
 
   protected _drawBoxPlotVertical(ctx: CanvasRenderingContext2D): void {
     //const { options } = this;
-    const props = this.getProps(['x', 'width', 'q1', 'q3', 'median', 'whiskerMin', 'whiskerMax','startTimes','endTimes']);
+    const props = this.getProps([
+      'x',
+      'width',
+      'q1',
+      'q3',
+      'median',
+      'whiskerMin',
+      'whiskerMax',
+      'startTimes',
+      'endTimes',
+    ]);
     const { startTimes } = props;
     const { endTimes } = props;
     const { x } = props;
     const { width } = props;
     const x0 = x - width / 2;
 
-    /*if (times != undefined && times.length > 0) {
-      times.forEach((time)=>{
-        console.log(time.startTime,time.endTime,props.q1,props.q3);
-      })
-    }*/
-    for (let i = 0; i < startTimes.length; i++){
-      ctx.fillRect(x0, startTimes[i], width, endTimes[i]-startTimes[i]);
+    for (let i = 0; i < startTimes.length; i++) {
+      ctx.fillRect(x0, startTimes[i], width, endTimes[i] - startTimes[i]);
     }
-    
-    // Draw the q1>q3 box
-    /*if (props.q3 > props.q1) {
-      ctx.fillRect(x0, props.q1, width, props.q3 - props.q1);
-    } else {
-      ctx.fillRect(x0, props.q3, width, props.q1 - props.q3);
-    }*/
-
-    // Draw the median line
-    ctx.save();
-    /*
-    if (options.medianColor && options.medianColor !== 'transparent' && options.medianColor !== '#0000') {
-      ctx.strokeStyle = options.medianColor;
-    }
-    ctx.beginPath();
-    ctx.moveTo(x0, props.median);
-    ctx.lineTo(x0 + width, props.median);
-    ctx.closePath();
-    ctx.stroke();
-    ctx.restore();
 
     ctx.save();
-    // fill the part below the median with lowerColor
-    if (
-      options.lowerBackgroundColor &&
-      options.lowerBackgroundColor !== 'transparent' &&
-      options.lowerBackgroundColor !== '#0000'
-    ) {
-      ctx.fillStyle = options.lowerBackgroundColor;
-      if (props.q3 > props.q1) {
-        ctx.fillRect(x0, props.median, width, props.q3 - props.median);
-      } else {
-        ctx.fillRect(x0, props.median, width, props.q1 - props.median);
-      }
-    }
-    ctx.restore();
-    
-    /*
-    // Draw the border around the main q1>q3 box
-    if (props.q3 > props.q1) {
-      ctx.strokeRect(x0, props.q1, width, props.q3 - props.q1);
-    } else {
-      ctx.strokeRect(x0, props.q3, width, props.q1 - props.q3);
-    }
-
-    // Draw the whiskers
-    ctx.beginPath();
-    ctx.moveTo(x0, props.whiskerMin);
-    ctx.lineTo(x0 + width, props.whiskerMin);
-    ctx.moveTo(x, props.whiskerMin);
-    ctx.lineTo(x, props.q1);
-    ctx.moveTo(x0, props.whiskerMax);
-    ctx.lineTo(x0 + width, props.whiskerMax);
-    ctx.moveTo(x, props.whiskerMax);
-    ctx.lineTo(x, props.q3);
-    ctx.closePath();
-    ctx.stroke();
-    */
-  }
-
-  protected _drawBoxPlotHorizontal(ctx: CanvasRenderingContext2D): void {
-    const { options } = this;
-    const props = this.getProps(['y', 'height', 'q1', 'q3', 'median', 'whiskerMin', 'whiskerMax']);
-
-    const { y } = props;
-    const { height } = props;
-    const y0 = y - height / 2;
-
-    // Draw the q1>q3 box
-    if (props.q3 > props.q1) {
-      ctx.fillRect(props.q1, y0, props.q3 - props.q1, height);
-    } else {
-      ctx.fillRect(props.q3, y0, props.q1 - props.q3, height);
-    }
-
-    // Draw the median line
-    ctx.save();
-    if (options.medianColor && options.medianColor !== 'transparent') {
-      ctx.strokeStyle = options.medianColor;
-    }
-    ctx.beginPath();
-    ctx.moveTo(props.median, y0);
-    ctx.lineTo(props.median, y0 + height);
-    ctx.closePath();
-    ctx.stroke();
-    ctx.restore();
-
-    ctx.save();
-    // fill the part below the median with lowerColor
-    if (options.lowerBackgroundColor && options.lowerBackgroundColor !== 'transparent') {
-      ctx.fillStyle = options.lowerBackgroundColor;
-      if (props.q3 > props.q1) {
-        ctx.fillRect(props.median, y0, props.q3 - props.median, height);
-      } else {
-        ctx.fillRect(props.median, y0, props.q1 - props.median, height);
-      }
-    }
-    ctx.restore();
-
-    // Draw the border around the main q1>q3 box
-    if (props.q3 > props.q1) {
-      ctx.strokeRect(props.q1, y0, props.q3 - props.q1, height);
-    } else {
-      ctx.strokeRect(props.q3, y0, props.q1 - props.q3, height);
-    }
-
-    // Draw the whiskers
-    ctx.beginPath();
-    ctx.moveTo(props.whiskerMin, y0);
-    ctx.lineTo(props.whiskerMin, y0 + height);
-    ctx.moveTo(props.whiskerMin, y);
-    ctx.lineTo(props.q1, y);
-    ctx.moveTo(props.whiskerMax, y0);
-    ctx.lineTo(props.whiskerMax, y0 + height);
-    ctx.moveTo(props.whiskerMax, y);
-    ctx.lineTo(props.q3, y);
-    ctx.closePath();
-    ctx.stroke();
   }
 
   _getBounds(useFinalPosition?: boolean): { left: number; top: number; right: number; bottom: number } {
