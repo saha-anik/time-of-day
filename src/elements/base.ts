@@ -1,5 +1,4 @@
 ﻿import { Element } from 'chart.js';
-import { drawPoint } from 'chart.js/helpers';
 
 export interface IStatsBaseOptions {
   /**
@@ -229,64 +228,6 @@ export class StatsBase<T extends IStatsBaseProps, O extends IStatsBaseOptions> e
 
   isVertical(): boolean {
     return !this.horizontal;
-  }
-
-  protected _drawOutliers(ctx: CanvasRenderingContext2D): void {
-    const vert = this.isVertical();
-    const props = this.getProps(['x', 'y', 'outliers']);
-    const { options } = this;
-    if (options.outlierRadius <= 0 || !props.outliers || props.outliers.length === 0) {
-      return;
-    }
-    ctx.save();
-    ctx.fillStyle = options.outlierBackgroundColor;
-    ctx.strokeStyle = options.outlierBorderColor;
-    ctx.lineWidth = options.outlierBorderWidth;
-
-    const pointOptions = {
-      pointStyle: options.outlierStyle,
-      radius: options.outlierRadius,
-      borderWidth: options.outlierBorderWidth,
-    };
-
-    if (vert) {
-      props.outliers.forEach((v) => {
-        drawPoint(ctx, pointOptions, props.x, v);
-      });
-    } else {
-      props.outliers.forEach((v) => {
-        drawPoint(ctx, pointOptions, v, props.y);
-      });
-    }
-
-    ctx.restore();
-  }
-
-  protected _drawMeanDot(ctx: CanvasRenderingContext2D): void {
-    const vert = this.isVertical();
-    const props = this.getProps(['x', 'y', 'mean']);
-    const { options } = this;
-    if (options.meanRadius <= 0 || props.mean == null || Number.isNaN(props.mean)) {
-      return;
-    }
-    ctx.save();
-    ctx.fillStyle = options.meanBackgroundColor;
-    ctx.strokeStyle = options.meanBorderColor;
-    ctx.lineWidth = options.meanBorderWidth;
-
-    const pointOptions = {
-      pointStyle: options.meanStyle,
-      radius: options.meanRadius,
-      borderWidth: options.meanBorderWidth,
-    };
-
-    if (vert) {
-      drawPoint(ctx, pointOptions, props.x, props.mean);
-    } else {
-      drawPoint(ctx, pointOptions, props.mean, props.y);
-    }
-
-    ctx.restore();
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars,class-methods-use-this

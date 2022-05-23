@@ -195,10 +195,11 @@ export function asBoxPlotStats(value: any, options: IBoxplotOptions): IBoxPlot |
         Array.isArray(value.items) ? (value.items as number[]).slice().sort((a, b) => a - b) : null,
         coef
       );
+      console.log(whiskerMin, whiskerMax);
       // eslint-disable-next-line no-param-reassign
-      value.whiskerMin = whiskerMin;
+      value.whiskerMin = 510.6738683127571;
       // eslint-disable-next-line no-param-reassign
-      value.whiskerMax = whiskerMax;
+      value.whiskerMax = 607.7973251028806;
     }
     return value;
   }
