@@ -12,7 +12,7 @@
 } from 'chart.js';
 import { merge } from 'chart.js/helpers';
 import { asBoxPlotStats, IBaseStats, IBoxPlot, IBoxplotOptions } from '../data';
-import { baseDefaults, StatsBase, defaultOverrides } from './StatsBase';
+import { baseDefaults, StatsBase } from './StatsBase';
 import { BoxAndWiskers, IBoxAndWhiskersOptions } from '../elements';
 import patchController from './patchController';
 import { boxOptionsKeys } from '../elements/BoxAndWiskers';
@@ -43,7 +43,7 @@ export class BoxPlotController extends StatsBase<IBoxPlot, Required<IBoxplotOpti
         numbers: {
           type: 'number',
           properties: (BarController.defaults as any).animations.numbers.properties.concat(
-            ['q1', 'q3', 'min', 'max', 'median', 'whiskerMin', 'whiskerMax', 'mean', 'startTimes','endTimes'],
+            ['q1', 'q3', 'min', 'max', 'median', 'whiskerMin', 'whiskerMax', 'mean', 'startTimes', 'endTimes'],
             boxOptionsKeys.filter((c) => !c.endsWith('Color'))
           ),
         },
@@ -52,7 +52,7 @@ export class BoxPlotController extends StatsBase<IBoxPlot, Required<IBoxplotOpti
     },
   ]);
 
-  static readonly overrides: any = /* #__PURE__ */ merge({}, [(BarController as any).overrides, defaultOverrides()]);
+  static readonly overrides: any = /* #__PURE__ */ merge({}, [(BarController as any).overrides]);
 }
 
 export interface BoxPlotControllerDatasetOptions

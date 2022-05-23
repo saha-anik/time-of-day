@@ -1,7 +1,6 @@
 ﻿import { Element } from 'chart.js';
 import { drawPoint } from 'chart.js/helpers';
 import { rnd } from '../data';
-import type { ExtendedTooltip } from '../tooltip';
 
 export interface IStatsBaseOptions {
   /**
@@ -407,41 +406,5 @@ export class StatsBase<T extends IStatsBaseProps, O extends IStatsBaseOptions> e
   protected _getOutliers(useFinalPosition?: boolean): number[] {
     const props = this.getProps(['outliers'], useFinalPosition);
     return props.outliers || [];
-  }
-
-  tooltipPosition(
-    eventPosition?: { x: number; y: number } | boolean,
-    tooltip?: ExtendedTooltip
-  ): { x: number; y: number } {
-    if (!eventPosition || typeof eventPosition === 'boolean') {
-      // fallback
-      return this.getCenterPoint();
-    }
-    if (tooltip) {
-      // eslint-disable-next-line no-param-reassign
-      delete tooltip._tooltipOutlier;
-    }
-
-    const props = this.getProps(['x', 'y']);
-    const index = this._outlierIndexInRange(eventPosition.x, eventPosition.y);
-    if (index < 0 || !tooltip) {
-      return this.getCenterPoint();
-    }
-    // hack in the data of the hovered outlier
-    // eslint-disable-next-line no-param-reassign
-    tooltip._tooltipOutlier = {
-      index,
-      datasetIndex: this._datasetIndex,
-    };
-    if (this.isVertical()) {
-      return {
-        x: props.x as number,
-        y: this._getOutliers()[index],
-      };
-    }
-    return {
-      x: this._getOutliers()[index],
-      y: props.y as number,
-    };
   }
 }

@@ -70,12 +70,15 @@ export class BoxAndWiskers extends StatsBase<IBoxAndWhiskerProps, IBoxAndWhisker
     const { endTimes } = props;
     const { x } = props;
     const { width } = props;
+    //const { whiskerMax, whiskerMin } = props;
     const x0 = x - width / 2;
 
     for (let i = 0; i < startTimes.length; i++) {
       ctx.fillRect(x0, startTimes[i], width, endTimes[i] - startTimes[i]);
+      //ctx.restore();
     }
-
+    /*ctx.fillStyle = '000000';
+    ctx.fillRect(x0, whiskerMin, width, whiskerMax - whiskerMin);*/
     ctx.save();
   }
 

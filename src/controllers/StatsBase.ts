@@ -1,7 +1,6 @@
 ﻿import { BarController, Element, ChartMeta, LinearScale, Scale, UpdateMode } from 'chart.js';
 import { formatNumber } from 'chart.js/helpers';
 import { interpolateNumberArray } from '../animation';
-import { outlierPositioner, patchInHoveredOutlier } from '../tooltip';
 import { defaultStatsOptions, IBaseOptions, IBaseStats } from '../data';
 
 export /* #__PURE__ */ function baseDefaults(keys: string[]): Record<string, unknown> {
@@ -40,19 +39,6 @@ export /* #__PURE__ */ function baseDefaults(keys: string[]): Record<string, unk
     minStats: 'min',
     maxStats: 'max',
     ...defaultStatsOptions,
-  };
-}
-
-export function defaultOverrides(): Record<string, unknown> {
-  return {
-    plugins: {
-      tooltip: {
-        position: outlierPositioner.register().id,
-        callbacks: {
-          beforeLabel: patchInHoveredOutlier,
-        },
-      },
-    },
   };
 }
 
