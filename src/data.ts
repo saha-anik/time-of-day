@@ -204,12 +204,3 @@ export function asBoxPlotStats(value: any, options: IBoxplotOptions): IBoxPlot |
   }
   return undefined;
 }
-
-export function rnd(seed = Date.now()): () => number {
-  // Adapted from http://indiegamr.com/generate-repeatable-random-numbers-in-js/
-  let s = seed;
-  return () => {
-    s = (s * 9301 + 49297) % 233280;
-    return s / 233280;
-  };
-}

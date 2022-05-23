@@ -1,6 +1,5 @@
 ﻿import { Element } from 'chart.js';
 import { drawPoint } from 'chart.js/helpers';
-import { rnd } from '../data';
 
 export interface IStatsBaseOptions {
   /**
@@ -230,45 +229,6 @@ export class StatsBase<T extends IStatsBaseProps, O extends IStatsBaseOptions> e
 
   isVertical(): boolean {
     return !this.horizontal;
-  }
-
-  protected _drawItems(ctx: CanvasRenderingContext2D): void {
-    const vert = this.isVertical();
-    const props = this.getProps(['x', 'y', 'items', 'width', 'height', 'outliers']);
-    const { options } = this;
-
-    if (options.itemRadius <= 0 || !props.items || props.items.length <= 0) {
-      return;
-    }
-    ctx.save();
-    ctx.strokeStyle = options.itemBorderColor;
-    ctx.fillStyle = options.itemBackgroundColor;
-    ctx.lineWidth = options.itemBorderWidth;
-    // jitter based on random data
-    // use the dataset index and index to initialize the random number generator
-    const random = rnd(this._datasetIndex * 1000 + this._index);
-
-    const pointOptions = {
-      pointStyle: options.itemStyle,
-      radius: options.itemRadius,
-      borderWidth: options.itemBorderWidth,
-    };
-    const outliers = new Set(props.outliers || []);
-
-    if (vert) {
-      props.items.forEach((v) => {
-        if (!outliers.has(v)) {
-          drawPoint(ctx, pointOptions, props.x - props.width / 2 + random() * props.width, v);
-        }
-      });
-    } else {
-      props.items.forEach((v) => {
-        if (!outliers.has(v)) {
-          drawPoint(ctx, pointOptions, v, props.y - props.height / 2 + random() * props.height);
-        }
-      });
-    }
-    ctx.restore();
   }
 
   protected _drawOutliers(ctx: CanvasRenderingContext2D): void {

@@ -1,16 +1,11 @@
 ﻿import { BarController, Element, ChartMeta, LinearScale, Scale, UpdateMode } from 'chart.js';
 import { formatNumber } from 'chart.js/helpers';
-import { interpolateNumberArray } from '../animation';
 import { defaultStatsOptions, IBaseOptions, IBaseStats } from '../data';
 
 export /* #__PURE__ */ function baseDefaults(keys: string[]): Record<string, unknown> {
   const colorKeys = ['borderColor', 'backgroundColor'].concat(keys.filter((c) => c.endsWith('Color')));
   return {
     animations: {
-      numberArray: {
-        fn: interpolateNumberArray,
-        properties: ['outliers', 'items'],
-      },
       colors: {
         type: 'color',
         properties: colorKeys,
