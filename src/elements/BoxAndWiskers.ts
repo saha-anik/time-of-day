@@ -32,21 +32,15 @@ export interface IBoxAndWhiskerProps extends IStatsBaseProps {
   endTimes: number[];
 }
 
-export class BoxAndWiskers extends StatsBase<IBoxAndWhiskerProps, IBoxAndWhiskersOptions> {
+export class BoxAndWiskers extends StatsBase<IBoxAndWhiskerProps, IStatsBaseOptions> {
   draw(ctx: CanvasRenderingContext2D): void {
     ctx.save();
 
     ctx.fillStyle = this.options.backgroundColor;
     ctx.strokeStyle = this.options.borderColor;
     ctx.lineWidth = this.options.borderWidth;
-
     this._drawBoxPlot(ctx);
-    //this._drawOutliers(ctx);
-    //this._drawMeanDot(ctx);
-
     ctx.restore();
-
-    //this._drawItems(ctx);
   }
 
   protected _drawBoxPlot(ctx: CanvasRenderingContext2D): void {

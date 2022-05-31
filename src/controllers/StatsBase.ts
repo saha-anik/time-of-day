@@ -1,6 +1,6 @@
-﻿import { BarController, Element, ChartMeta, LinearScale, Scale, UpdateMode } from 'chart.js';
+﻿import { BarController, Element, ChartMeta, LinearScale, UpdateMode } from 'chart.js';
 import { formatNumber } from 'chart.js/helpers';
-import { defaultStatsOptions, IBaseOptions, IBaseStats } from '../data';
+import type { ITimeOfDayOptions, ITimeOfDay } from '../data';
 
 export /* #__PURE__ */ function baseDefaults(keys: string[]): Record<string, unknown> {
   const colorKeys = ['borderColor', 'backgroundColor'].concat(keys.filter((c) => c.endsWith('Color')));
@@ -33,43 +33,20 @@ export /* #__PURE__ */ function baseDefaults(keys: string[]): Record<string, unk
     },
     minStats: 'min',
     maxStats: 'max',
-    ...defaultStatsOptions,
   };
 }
 
-export abstract class StatsBase<S extends IBaseStats, C extends Required<IBaseOptions>> extends BarController {
+export abstract class StatsBase<S extends ITimeOfDay, C extends Required<ITimeOfDayOptions>> extends BarController {
   declare options: C;
 
   // eslint-disable-next-line class-methods-use-this,@typescript-eslint/explicit-module-boundary-types
   protected _transformStats<T>(target: any, source: S, mapper: (v: number) => T): void {
-    for (const key of ['min', 'max', 'median', 'q3', 'q1', 'mean']) {
-      const v = source[key as keyof IBaseStats];
-      if (typeof v === 'number') {
+    for (const key of ['startTimes', 'endTimes']) {
+      if (Array.isArray(source[key as keyof ITimeOfDay])) {
         // eslint-disable-next-line no-param-reassign
-        target[key] = mapper(v);
+        target[key] = source[key as 'startTimes' | 'endTimes'].map(mapper);
       }
     }
-
-    for (const key of ['outliers', 'items', 'startTimes', 'endTimes']) {
-      if (Array.isArray(source[key as keyof IBaseStats])) {
-        // eslint-disable-next-line no-param-reassign
-        target[key] = source[key as 'outliers' | 'items' | 'startTimes' | 'endTimes'].map(mapper);
-      }
-    }
-  }
-
-  getMinMax(scale: Scale, canStack?: boolean | undefined): { min: number; max: number } {
-    const bak = scale.axis;
-    const config = this.options;
-    // eslint-disable-next-line no-param-reassign
-    scale.axis = config.minStats;
-    const { min } = super.getMinMax(scale, canStack);
-    // eslint-disable-next-line no-param-reassign
-    scale.axis = config.maxStats;
-    const { max } = super.getMinMax(scale, canStack);
-    // eslint-disable-next-line no-param-reassign
-    scale.axis = bak;
-    return { min, max };
   }
 
   parsePrimitiveData(meta: ChartMeta, data: any[], start: number, count: number): Record<string, unknown>[] {

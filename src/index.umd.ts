@@ -1,8 +1,8 @@
 import { registry } from 'chart.js';
-import { BoxPlotController } from './controllers';
+import { TimeOfDayController } from './controllers';
 import { BoxAndWiskers } from './elements';
 
 export * from '.';
 
-registry.addControllers(BoxPlotController);
+registry.addControllers(TimeOfDayController);
 registry.addElements(BoxAndWiskers);
