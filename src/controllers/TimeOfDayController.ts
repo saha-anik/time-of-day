@@ -11,13 +11,12 @@
   AnimationOptions,
 } from 'chart.js';
 import { merge } from 'chart.js/helpers';
-import type { ITimeOfDay, ITimeOfDayOptions } from '../data';
-import { baseDefaults, StatsBase } from './StatsBase';
-import { BoxAndWiskers, IBoxAndWhiskersOptions } from '../elements';
+import type { ITimeOfDay } from '../data';
+import { StatsBase } from './StatsBase';
+import { Boxes, IStatsBaseOptions } from '../elements';
 import patchController from './patchController';
-import { boxOptionsKeys } from '../elements/BoxAndWiskers';
 
-export class TimeOfDayController extends StatsBase<ITimeOfDay, Required<ITimeOfDayOptions>> {
+export class TimeOfDayController extends StatsBase<ITimeOfDay> {
   // eslint-disable-next-line class-methods-use-this
   protected _parseStats(value: any): ITimeOfDay | undefined {
     if (!value) {
@@ -30,18 +29,14 @@ export class TimeOfDayController extends StatsBase<ITimeOfDay, Required<ITimeOfD
 
   static readonly defaults: any = /* #__PURE__ */ merge({}, [
     BarController.defaults,
-    baseDefaults(boxOptionsKeys),
     {
       animations: {
         numbers: {
           type: 'number',
-          properties: (BarController.defaults as any).animations.numbers.properties.concat(
-            ['startTimes', 'endTimes'],
-            boxOptionsKeys.filter((c) => !c.endsWith('Color'))
-          ),
+          properties: (BarController.defaults as any).animations.numbers.properties.concat(['startTimes', 'endTimes']),
         },
       },
-      dataElementType: BoxAndWiskers.id,
+      dataElementType: Boxes.id,
     },
   ]);
 
@@ -50,8 +45,7 @@ export class TimeOfDayController extends StatsBase<ITimeOfDay, Required<ITimeOfD
 
 export interface TimeOfDayControllerDatasetOptions
   extends ControllerDatasetOptions,
-    ITimeOfDayOptions,
-    ScriptableAndArrayOptions<IBoxAndWhiskersOptions, 'timeofday'>,
+    ScriptableAndArrayOptions<IStatsBaseOptions, 'timeofday'>,
     ScriptableAndArrayOptions<CommonHoverOptions, 'timeofday'>,
     AnimationOptions<'timeofday'> {}
 
@@ -81,6 +75,6 @@ export class BoxPlotChart<DATA extends unknown[] = TimeOfDayDataPoint[], LABEL =
   static id = TimeOfDayController.id;
 
   constructor(item: ChartItem, config: Omit<ChartConfiguration<'timeofday', DATA, LABEL>, 'type'>) {
-    super(item, patchController('timeofday', config, TimeOfDayController, BoxAndWiskers, [LinearScale, CategoryScale]));
+    super(item, patchController('timeofday', config, TimeOfDayController, Boxes, [LinearScale, CategoryScale]));
   }
 }

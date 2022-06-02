@@ -1,5 +1,12 @@
 ﻿import { Element } from 'chart.js';
 
+export interface TooltipArea {
+  left: number;
+  top: number;
+  right: number;
+  bottom: number;
+}
+
 export interface IStatsBaseOptions {
   /**
    * @default see rectangle
@@ -23,200 +30,23 @@ export interface IStatsBaseOptions {
   borderWidth: number;
 
   /**
-   * item style used to render outliers
-   * @default circle
-   */
-  outlierStyle:
-    | 'circle'
-    | 'triangle'
-    | 'rect'
-    | 'rectRounded'
-    | 'rectRot'
-    | 'cross'
-    | 'crossRot'
-    | 'star'
-    | 'line'
-    | 'dash';
-
-  /**
-   * radius used to render outliers
-   * @default 2
-   * @scriptable
-   * @indexable
-   */
-  outlierRadius: number;
-
-  /**
-   * @default see rectangle.backgroundColor
-   * @scriptable
-   * @indexable
-   */
-  outlierBackgroundColor: string;
-
-  /**
-   * @default see rectangle.borderColor
-   * @scriptable
-   * @indexable
-   */
-  outlierBorderColor: string;
-  /**
-   * @default 1
-   * @scriptable
-   * @indexable
-   */
-  outlierBorderWidth: number;
-
-  /**
-   * item style used to render items
-   * @default circle
-   */
-  itemStyle:
-    | 'circle'
-    | 'triangle'
-    | 'rect'
-    | 'rectRounded'
-    | 'rectRot'
-    | 'cross'
-    | 'crossRot'
-    | 'star'
-    | 'line'
-    | 'dash';
-
-  /**
-   * radius used to render items
-   * @default 0 so disabled
-   * @scriptable
-   * @indexable
-   */
-  itemRadius: number;
-
-  /**
-   * background color for items
-   * @default see rectangle.backgroundColor
-   * @scriptable
-   * @indexable
-   */
-  itemBackgroundColor: string;
-
-  /**
-   * border color for items
-   * @default see rectangle.borderColor
-   * @scriptable
-   * @indexable
-   */
-  itemBorderColor: string;
-
-  /**
-   * border width for items
-   * @default 0
-   * @scriptable
-   * @indexable
-   */
-  itemBorderWidth: number;
-
-  /**
    * padding that is added around the bounding box when computing a mouse hit
    * @default 2
    * @scriptable
    * @indexable
    */
   hitPadding: number;
-
-  /**
-   * hit radius for hit test of outliers
-   * @default 4
-   * @scriptable
-   * @indexable
-   */
-  outlierHitRadius: number;
-
-  /**
-   * item style used to render mean dot
-   * @default circle
-   */
-  meanStyle:
-    | 'circle'
-    | 'triangle'
-    | 'rect'
-    | 'rectRounded'
-    | 'rectRot'
-    | 'cross'
-    | 'crossRot'
-    | 'star'
-    | 'line'
-    | 'dash';
-
-  /**
-   * radius used to mean dots
-   * @default 3
-   * @scriptable
-   * @indexable
-   */
-  meanRadius: number;
-
-  /**
-   * background color for mean dot
-   * @default see rectangle.backgroundColor
-   * @scriptable
-   * @indexable
-   */
-  meanBackgroundColor: string;
-
-  /**
-   * border color for mean dot
-   * @default see rectangle.borderColor
-   * @scriptable
-   * @indexable
-   */
-  meanBorderColor: string;
-
-  /**
-   * border width for mean dot
-   * @default 0
-   * @scriptable
-   * @indexable
-   */
-  meanBorderWidth: number;
 }
-
-export const baseDefaults = {
-  borderWidth: 1,
-
-  outlierStyle: 'circle',
-  outlierRadius: 2,
-  outlierBorderWidth: 1,
-
-  itemStyle: 'circle',
-  itemRadius: 0,
-  itemBorderWidth: 0,
-
-  meanStyle: 'circle',
-  meanRadius: 3,
-  meanBorderWidth: 1,
-
-  hitPadding: 2,
-  outlierHitRadius: 4,
-};
-
-export const baseRoutes = {
-  outlierBackgroundColor: 'backgroundColor',
-  outlierBorderColor: 'borderColor',
-  itemBackgroundColor: 'backgroundColor',
-  itemBorderColor: 'borderColor',
-  meanBackgroundColor: 'backgroundColor',
-  meanBorderColor: 'borderColor',
-};
-
-export const baseOptionKeys = /* #__PURE__ */ (() => Object.keys(baseDefaults).concat(Object.keys(baseRoutes)))();
 
 export interface IStatsBaseProps {
   x: number;
   y: number;
   width: number;
   height: number;
-  items: number[];
-  outliers: number[];
-  mean: number;
+  whiskerMin: number;
+  whiskerMax: number;
+  startTimes: number[];
+  endTimes: number[];
 }
 
 export class StatsBase<T extends IStatsBaseProps, O extends IStatsBaseOptions> extends Element<T, O> {
@@ -256,10 +86,7 @@ export class StatsBase<T extends IStatsBaseProps, O extends IStatsBaseOptions> e
     if (Number.isNaN(this.x) && Number.isNaN(this.y)) {
       return false;
     }
-    return (
-      this._boxInRange(mouseX, mouseY, useFinalPosition) ||
-      this._outlierIndexInRange(mouseX, mouseY, useFinalPosition) >= 0
-    );
+    return this._boxInRange(mouseX, mouseY, useFinalPosition);
   }
 
   inXRange(mouseX: number, useFinalPosition?: boolean): boolean {
@@ -270,25 +97,6 @@ export class StatsBase<T extends IStatsBaseProps, O extends IStatsBaseOptions> e
   inYRange(mouseY: number, useFinalPosition?: boolean): boolean {
     const bounds = this._getHitBounds(useFinalPosition);
     return mouseY >= bounds.top && mouseY <= bounds.bottom;
-  }
-
-  protected _outlierIndexInRange(mouseX: number, mouseY: number, useFinalPosition?: boolean): number {
-    const props = this.getProps(['x', 'y'], useFinalPosition);
-    const hitRadius = this.options.outlierHitRadius;
-    const outliers = this._getOutliers(useFinalPosition);
-    const vertical = this.isVertical();
-
-    // check if along the outlier line
-    if ((vertical && Math.abs(mouseX - props.x) > hitRadius) || (!vertical && Math.abs(mouseY - props.y) > hitRadius)) {
-      return -1;
-    }
-    const toCompare = vertical ? mouseY : mouseX;
-    for (let i = 0; i < outliers.length; i += 1) {
-      if (Math.abs(outliers[i] - toCompare) <= hitRadius) {
-        return i;
-      }
-    }
-    return -1;
   }
 
   protected _boxInRange(mouseX: number, mouseY: number, useFinalPosition?: boolean): boolean {
@@ -302,10 +110,5 @@ export class StatsBase<T extends IStatsBaseProps, O extends IStatsBaseOptions> e
       x: props.x,
       y: props.y,
     };
-  }
-
-  protected _getOutliers(useFinalPosition?: boolean): number[] {
-    const props = this.getProps(['outliers'], useFinalPosition);
-    return props.outliers || [];
   }
 }

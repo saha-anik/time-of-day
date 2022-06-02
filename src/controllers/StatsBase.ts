@@ -1,44 +1,8 @@
 ﻿import { BarController, Element, ChartMeta, LinearScale, UpdateMode } from 'chart.js';
 import { formatNumber } from 'chart.js/helpers';
-import type { ITimeOfDayOptions, ITimeOfDay } from '../data';
+import type { ITimeOfDay } from '../data';
 
-export /* #__PURE__ */ function baseDefaults(keys: string[]): Record<string, unknown> {
-  const colorKeys = ['borderColor', 'backgroundColor'].concat(keys.filter((c) => c.endsWith('Color')));
-  return {
-    animations: {
-      colors: {
-        type: 'color',
-        properties: colorKeys,
-      },
-    },
-    transitions: {
-      show: {
-        animations: {
-          colors: {
-            type: 'color',
-            properties: colorKeys,
-            from: 'transparent',
-          },
-        },
-      },
-      hide: {
-        animations: {
-          colors: {
-            type: 'color',
-            properties: colorKeys,
-            to: 'transparent',
-          },
-        },
-      },
-    },
-    minStats: 'min',
-    maxStats: 'max',
-  };
-}
-
-export abstract class StatsBase<S extends ITimeOfDay, C extends Required<ITimeOfDayOptions>> extends BarController {
-  declare options: C;
-
+export abstract class StatsBase<S extends ITimeOfDay> extends BarController {
   // eslint-disable-next-line class-methods-use-this,@typescript-eslint/explicit-module-boundary-types
   protected _transformStats<T>(target: any, source: S, mapper: (v: number) => T): void {
     for (const key of ['startTimes', 'endTimes']) {
@@ -60,10 +24,10 @@ export abstract class StatsBase<S extends ITimeOfDay, C extends Required<ITimeOf
       const index = i + start;
       const parsed: any = {};
       parsed[iScale.axis] = iScale.parse(labels[index], index);
-      const stats = this._parseStats(data == null ? null : data[index], this.options);
+      const stats = this._parseStats(data == null ? null : data[index]);
       if (stats) {
         Object.assign(parsed, stats);
-        parsed[vScale.axis] = stats.median;
+        parsed[vScale.axis] = stats.startTimes[0];
       }
       r.push(parsed);
     }
@@ -79,7 +43,7 @@ export abstract class StatsBase<S extends ITimeOfDay, C extends Required<ITimeOf
   }
 
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-  protected abstract _parseStats(value: any, options: C): S | undefined;
+  protected abstract _parseStats(value: any): S | undefined;
 
   getLabelAndValue(index: number): { label: string; value: string & { raw: S; hoveredOutlierIndex: number } & S } {
     const r = super.getLabelAndValue(index) as any;
@@ -90,16 +54,10 @@ export abstract class StatsBase<S extends ITimeOfDay, C extends Required<ITimeOf
     }
     r.value = {
       raw: parsed,
-      hoveredOutlierIndex: -1,
     };
     this._transformStats(r.value, parsed, (v) => vScale.getLabelForValue(v));
     const s = this._toStringStats(r.value.raw);
     r.value.toString = function toString() {
-      // custom to string function for the 'value'
-      if (this.hoveredOutlierIndex >= 0) {
-        // TODO formatter
-        return `(outlier: ${this.outliers[this.hoveredOutlierIndex]})`;
-      }
       return s;
     };
     return r;
@@ -109,9 +67,7 @@ export abstract class StatsBase<S extends ITimeOfDay, C extends Required<ITimeOf
   protected _toStringStats(b: S): string {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const f = (v: number) => (v == null ? 'NaN' : formatNumber(v, this.chart.options.locale!, {}));
-    return `(min: ${f(b.min)}, 25% quantile: ${f(b.q1)}, median: ${f(b.median)}, mean: ${f(b.mean)}, 75% quantile: ${f(
-      b.q3
-    )}, max: ${f(b.max)})`;
+    return `(min: ${f(b.startTimes[0])}, max: ${f(b.endTimes[b.endTimes.length - 1])})`;
   }
 
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types

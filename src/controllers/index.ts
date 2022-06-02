@@ -1,1 +1,1 @@
-export * from './BoxPlotController';
+export * from './TimeOfDayController';
